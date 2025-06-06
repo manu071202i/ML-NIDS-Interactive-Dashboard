@@ -26,9 +26,6 @@ This is a single-page web application. To view it:
 
 ## Live Demo
 (Once you've uploaded and set up GitHub Pages, you'll put your live link here, e.g., `https://your-username.github.io/your-repository-name/`)
-
-## Project Structure (for a full ML project)
-While this dashboard is a single HTML file, a complete ML-NIDS project would typically include:
 ## Setup (for a full Python ML project - conceptual)
 If you were to build the full Python backend for this project, you would:
 1.  **Clone the repository:**
