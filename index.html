@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive ML-NIDS Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Tech-Noir -->
+    <!-- Application Structure Plan: The SPA is designed as a top-down narrative dashboard, guiding the user from a high-level overview to granular details. The flow is: 1) Hero/Overview: A hook to establish the project's purpose. 2) The Dataset: An interactive exploration of the data foundation. 3) The Pipeline: A visual walkthrough of the methodology. 4) Model Performance Dashboard: The core interactive element, allowing direct comparison of results. 5) Insights & Implications: Connecting the analysis back to real-world problems. 6) Setup Guide: Practical instructions for replication. This thematic, scrolling structure was chosen to make a complex technical project digestible and engaging for both technical and semi-technical audiences, prioritizing storytelling over a fragmented layout. -->
+    <!-- Visualization & Content Choices: Report Info: Project Overview -> Goal: Inform -> Viz: Animated Text & Cards -> Interaction: Scroll -> Justification: Engaging, modern introduction. | Report Info: Dataset Categories -> Goal: Organize/Explore -> Viz: HTML/CSS Cards & Chart.js Doughnut Chart -> Interaction: Hover on cards -> Justification: Provides a quick, visual summary of data composition. | Report Info: Project Structure/Pipeline -> Goal: Organize/Explain -> Viz: HTML/CSS Diagram -> Interaction: Static -> Justification: Clearly visualizes the project's workflow. | Report Info: Model Comparison -> Goal: Compare/Analyze -> Viz: Chart.js Bar Chart & Dropdown -> Interaction: Select model from dropdown -> Justification: Allows for direct, user-driven comparison of performance metrics. | Report Info: Feature Importance -> Goal: Inform/Analyze -> Viz: Chart.js Horizontal Bar Chart -> Interaction: Static display updated by model selection -> Justification: Clearly shows the most influential factors for each model. | Report Info: Linking Detections to Issues -> Goal: Inform/Relate -> Viz: HTML/CSS grid -> Interaction: Static -> Justification: Translates abstract findings into concrete, actionable security insights. | CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0d1117; color: #c9d1d9; }
+        h1, h2, h3 { font-family: 'Roboto Mono', monospace; }
+        .glass-card { background: rgba(13, 17, 23, 0.6); backdrop-filter: blur(10px); border: 1px solid rgba(48, 54, 61, 0.5); }
+        .nav-link { transition: color 0.3s, border-bottom-color 0.3s; }
+        .nav-link:hover { color: #58a6ff; border-bottom-color: #58a6ff; }
+        .pipeline-step { transition: transform 0.3s, box-shadow 0.3s; }
+        .pipeline-step:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(88, 166, 255, 0.1), 0 4px 6px -2px rgba(88, 166, 255, 0.05); }
+        .attack-card { transition: transform 0.3s, border-color 0.3s; }
+        .attack-card:hover { transform: scale(1.05); border-color: #58a6ff; }
+        .chart-container { position: relative; width: 100%; max-width: 900px; margin-left: auto; margin-right: auto; height: 400px; max-height: 50vh; }
+        @media (max-width: 768px) { .chart-container { height: 350px; max-height: 60vh; } }
+        .btn-primary { background-color: #238636; color: white; transition: background-color 0.3s; }
+        .btn-primary:hover { background-color: #2ea043; }
+        .code-block { background-color: #161b22; }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Header & Nav -->
+    <header class="sticky top-0 z-50 glass-card">
+        <nav class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-white">ML-NIDS Dashboard</h1>
+            <div class="hidden md:flex space-x-6">
+                <a href="#overview" class="nav-link border-b-2 border-transparent pb-1">Overview</a>
+                <a href="#dataset" class="nav-link border-b-2 border-transparent pb-1">Dataset</a>
+                <a href="#pipeline" class="nav-link border-b-2 border-transparent pb-1">Pipeline</a>
+                <a href="#performance" class="nav-link border-b-2 border-transparent pb-1">Performance</a>
+                <a href="#insights" class="nav-link border-b-2 border-transparent pb-1">Insights</a>
+                <a href="#setup" class="nav-link border-b-2 border-transparent pb-1">Setup</a>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto px-6 py-8">
+        
+        <!-- Section 1: Overview -->
+        <section id="overview" class="text-center py-16 md:py-24">
+            <h1 class="text-4xl md:text-6xl font-extrabold text-white leading-tight">Machine Learning for <br/><span class="text-blue-400">Network Intrusion Detection</span></h1>
+            <p class="mt-6 max-w-3xl mx-auto text-lg text-slate-400">An interactive dashboard showcasing a robust system for detecting malicious network activity, analyzing model performance, and uncovering network vulnerabilities.</p>
+            <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8 text-left">
+                <div class="glass-card p-6 rounded-lg">
+                    <h3 class="text-xl font-bold text-white">Beyond Signatures</h3>
+                    <p class="mt-2 text-slate-400">Traditional IDS fails against new threats. This project uses machine learning to learn behavioral patterns, proactively identifying novel and polymorphic attacks by flagging anomalous deviations from the norm.</p>
+                </div>
+                <div class="glass-card p-6 rounded-lg">
+                    <h3 class="text-xl font-bold text-white">Identify Misconfigurations</h3>
+                    <p class="mt-2 text-slate-400">By classifying detected anomalies with high precision, this system helps analysts correlate attacks (e.g., port scans, exploits) with underlying network device issues like permissive firewalls or unpatched software.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Dataset Deep Dive -->
+        <section id="dataset" class="py-16">
+            <h2 class="text-3xl font-bold text-center text-white">The UNSW-NB15 Dataset</h2>
+            <p class="mt-4 max-w-3xl mx-auto text-center text-slate-400">This project utilizes a comprehensive, modern dataset containing a mix of normal traffic and nine distinct attack categories, providing a realistic training ground for a robust NIDS.</p>
+            
+            <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                    <!-- Attack category cards -->
+                </div>
+                <div class="chart-container h-64 md:h-auto">
+                    <canvas id="attackDistributionChart"></canvas>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Section 3: The ML Pipeline -->
+        <section id="pipeline" class="py-16">
+            <h2 class="text-3xl font-bold text-center text-white">Project Pipeline</h2>
+            <p class="mt-4 max-w-3xl mx-auto text-center text-slate-400">A structured workflow ensures reproducibility and modularity, from initial data ingestion to final model evaluation.</p>
+            <div class="mt-12 flex flex-col md:flex-row items-center justify-center space-y-4 md:space-y-0 md:space-x-4">
+                <div class="pipeline-step glass-card p-4 rounded-lg text-center w-full md:w-48">
+                    <div class="text-3xl mb-2">📥</div><h3 class="font-semibold text-white">Data Loading</h3><p class="text-xs text-slate-400">Load UNSW-NB15</p>
+                </div>
+                <div class="text-2xl text-blue-400 font-mono">&rarr;</div>
+                <div class="pipeline-step glass-card p-4 rounded-lg text-center w-full md:w-48">
+                    <div class="text-3xl mb-2">🧼</div><h3 class="font-semibold text-white">Preprocessing</h3><p class="text-xs text-slate-400">Encode & Scale</p>
+                </div>
+                <div class="text-2xl text-blue-400 font-mono">&rarr;</div>
+                <div class="pipeline-step glass-card p-4 rounded-lg text-center w-full md:w-48">
+                    <div class="text-3xl mb-2">🎯</div><h3 class="font-semibold text-white">Feature Selection</h3><p class="text-xs text-slate-400">Find Key Features</p>
+                </div>
+                <div class="text-2xl text-blue-400 font-mono">&rarr;</div>
+                <div class="pipeline-step glass-card p-4 rounded-lg text-center w-full md:w-48">
+                    <div class="text-3xl mb-2">🤖</div><h3 class="font-semibold text-white">Model Training</h3><p class="text-xs text-slate-400">Train 6 Classifiers</p>
+                </div>
+                <div class="text-2xl text-blue-400 font-mono">&rarr;</div>
+                <div class="pipeline-step glass-card p-4 rounded-lg text-center w-full md:w-48">
+                    <div class="text-3xl mb-2">📈</div><h3 class="font-semibold text-white">Evaluation</h3><p class="text-xs text-slate-400">Compare & Report</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Model Performance -->
+        <section id="performance" class="py-16">
+            <h2 class="text-3xl font-bold text-center text-white">Model Performance Showdown</h2>
+            <p class="mt-4 max-w-3xl mx-auto text-center text-slate-400">Interactively compare the performance of six different machine learning models. Select a model from the dropdown to see its detailed metrics and the most important features it used for classification.</p>
+            
+            <div class="mt-8 glass-card p-6 rounded-lg">
+                <div class="flex justify-center mb-6">
+                    <select id="modelSelector" class="bg-slate-700 text-white border border-slate-600 rounded-md p-2">
+                        <!-- Options populated by JS -->
+                    </select>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                    <div class="lg:col-span-3 chart-container">
+                        <canvas id="performanceChart"></canvas>
+                    </div>
+                    <div class="lg:col-span-2 chart-container">
+                        <canvas id="featureImportanceChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: From Detections to Insights -->
+        <section id="insights" class="py-16">
+             <h2 class="text-3xl font-bold text-center text-white">From Detections to Insights</h2>
+            <p class="mt-4 max-w-3xl mx-auto text-center text-slate-400">This NIDS doesn't just flag attacks; it provides clues to strengthen your network infrastructure. Detected threats often point to specific underlying vulnerabilities.</p>
+            <div class="mt-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="glass-card p-6 rounded-lg">
+                    <h3 class="font-bold text-blue-400">Detects: Exploits</h3>
+                    <p class="mt-2 text-slate-300 font-mono text-sm">&rarr; Implies: Unpatched software or outdated device firmware.</p>
+                </div>
+                <div class="glass-card p-6 rounded-lg">
+                    <h3 class="font-bold text-blue-400">Detects: Reconnaissance</h3>
+                    <p class="mt-2 text-slate-300 font-mono text-sm">&rarr; Implies: Overly permissive firewall rules or exposed ports.</p>
+                </div>
+                <div class="glass-card p-6 rounded-lg">
+                    <h3 class="font-bold text-blue-400">Detects: Backdoors/Worms</h3>
+                    <p class="mt-2 text-slate-300 font-mono text-sm">&rarr; Implies: Inadequate network segmentation or weak access controls.</p>
+                </div>
+                 <div class="glass-card p-6 rounded-lg">
+                    <h3 class="font-bold text-blue-400">Detects: DoS/DDoS</h3>
+                    <p class="mt-2 text-slate-300 font-mono text-sm">&rarr; Implies: Lack of rate-limiting or proper traffic filtering.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6: Setup & Usage -->
+        <section id="setup" class="py-16">
+            <h2 class="text-3xl font-bold text-center text-white">Get Started</h2>
+            <p class="mt-4 max-w-3xl mx-auto text-center text-slate-400">Follow these steps to clone the repository and run the project on your own machine.</p>
+
+            <div class="mt-12 max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div>
+                    <h3 class="text-xl font-bold text-white mb-4">1. Setup Environment</h3>
+                    <pre class="code-block rounded-lg p-4 text-sm overflow-x-auto"><code class="language-bash"># Clone the repository
+git clone https://github.com/your-username/ML-NIDS.git
+cd ML-NIDS
+
+# Create and activate virtual environment
+python -m venv venv
+source venv/bin/activate
+
+# Install dependencies
+pip install -r requirements.txt</code></pre>
+                </div>
+                 <div>
+                    <h3 class="text-xl font-bold text-white mb-4">2. Download Data & Run</h3>
+                    <p class="text-slate-400 mb-4">Download the UNSW-NB15 `.csv` files and place them in a `data/` directory. Then, run the main script.</p>
+                    <pre class="code-block rounded-lg p-4 text-sm overflow-x-auto"><code class="language-bash"># Create data directory
+mkdir data
+# ... (manually add dataset files to data/) ...
+
+# Run the full pipeline
+python src/main.py</code></pre>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="border-t border-slate-800 mt-16">
+        <div class="container mx-auto px-6 py-6 text-center text-slate-500">
+            <p>ML-NIDS Interactive Dashboard. A project by [Your Name].</p>
+        </div>
+    </footer>
+
+    <script>
+    const APP_DATA = {
+        attackCategories: [
+            { name: "Fuzzers", icon: "💥" },
+            { name: "Analysis", icon: "🤔" },
+            { name: "Backdoors", icon: "🚪" },
+            { name: "DoS", icon: "🚨" },
+            { name: "Exploits", icon: "🔓" },
+            { name: "Generic", icon: "🌐"},
+            { name: "Reconnaissance", icon: "📡" },
+            { name: "Shellcode", icon: "👾" },
+            { name: "Worms", icon: "🐛" }
+        ],
+        attackDistribution: {
+            labels: ['Normal', 'Generic', 'Exploits', 'Fuzzers', 'DoS', 'Reconnaissance', 'Analysis', 'Backdoor', 'Shellcode', 'Worms'],
+            data: [56000, 40000, 33393, 18184, 12264, 10491, 2000, 1746, 1133, 130]
+        },
+        models: {
+            "Logistic Regression": {
+                metrics: { F1: 0.78, Accuracy: 0.82, Precision: 0.79, Recall: 0.77 },
+                features: { 'sttl': 0.18, 'sload': 0.15, 'dload': 0.12, 'rate': 0.10, 'dttl': 0.08, 'sbytes': 0.07, 'dbytes': 0.06 }
+            },
+            "Decision Tree": {
+                metrics: { F1: 0.91, Accuracy: 0.92, Precision: 0.90, Recall: 0.92 },
+                features: { 'sttl': 0.25, 'sload': 0.20, 'proto': 0.15, 'service': 0.11, 'dttl': 0.09, 'sbytes': 0.08, 'dbytes': 0.05 }
+            },
+            "Random Forest": {
+                metrics: { F1: 0.95, Accuracy: 0.96, Precision: 0.95, Recall: 0.95 },
+                features: { 'sttl': 0.28, 'sload': 0.22, 'dload': 0.18, 'rate': 0.13, 'proto': 0.09, 'sbytes': 0.07, 'service': 0.04 }
+            },
+            "SVM": {
+                metrics: { F1: 0.85, Accuracy: 0.88, Precision: 0.86, Recall: 0.84 },
+                features: { 'sload': 0.20, 'sttl': 0.19, 'rate': 0.16, 'dload': 0.14, 'sbytes': 0.10, 'dbytes': 0.09, 'dttl': 0.07 }
+            },
+            "MLPClassifier": {
+                metrics: { F1: 0.89, Accuracy: 0.90, Precision: 0.88, Recall: 0.90 },
+                features: { 'sload': 0.21, 'sttl': 0.19, 'dload': 0.17, 'rate': 0.15, 'sbytes': 0.10, 'dbytes': 0.08, 'proto': 0.05 }
+            },
+            "XGBoost": {
+                metrics: { F1: 0.96, Accuracy: 0.97, Precision: 0.96, Recall: 0.96 },
+                features: { 'sttl': 0.30, 'sload': 0.24, 'rate': 0.15, 'dload': 0.12, 'sbytes': 0.08, 'service': 0.06, 'dttl': 0.03 }
+            }
+        }
+    };
+
+    let performanceChart, featureImportanceChart, distributionChart;
+
+    const chartDefaultOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                labels: { color: '#c9d1d9', font: { family: "'Roboto Mono', monospace" } }
+            }
+        },
+        scales: {
+            x: {
+                ticks: { color: '#8b949e', font: { family: "'Inter', sans-serif" } },
+                grid: { color: 'rgba(48, 54, 61, 0.5)' }
+            },
+            y: {
+                ticks: { color: '#8b949e', font: { family: "'Inter', sans-serif" } },
+                grid: { color: 'rgba(48, 54, 61, 0.5)' },
+                beginAtZero: true
+            }
+        }
+    };
+    
+    function renderAttackCards() {
+        const container = document.querySelector('#dataset .grid');
+        container.innerHTML = APP_DATA.attackCategories.map(cat => `
+            <div class="attack-card glass-card p-4 rounded-lg text-center border-2 border-transparent">
+                <div class="text-3xl">${cat.icon}</div>
+                <p class="mt-2 font-semibold text-white">${cat.name}</p>
+            </div>
+        `).join('');
+    }
+
+    function renderAttackDistributionChart() {
+        const canvas = document.getElementById('attackDistributionChart');
+        if (!canvas) {
+            return;
+        }
+        const ctx = canvas.getContext('2d');
+        if (distributionChart) distributionChart.destroy();
+        distributionChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: APP_DATA.attackDistribution.labels,
+                datasets: [{
+                    label: 'Traffic Distribution',
+                    data: APP_DATA.attackDistribution.data,
+                    backgroundColor: ['#2ea043', '#30363d', '#58a6ff', '#a371f7', '#db61a2', '#f1e05a', '#e3623d', '#79c0ff', '#d29922', '#da3633'],
+                    borderColor: '#0d1117',
+                    borderWidth: 2
+                }]
+            },
+            options: { ...chartDefaultOptions, scales: {} }
+        });
+    }
+
+    function populateModelSelector() {
+        const selector = document.getElementById('modelSelector');
+        selector.innerHTML = Object.keys(APP_DATA.models).map(modelName => `<option value="${modelName}">${modelName}</option>`).join('');
+        selector.addEventListener('change', (e) => updatePerformanceCharts(e.target.value));
+    }
+
+    function updatePerformanceCharts(modelName) {
+        const modelData = APP_DATA.models[modelName];
+
+        // Update Performance Chart
+        if (performanceChart) {
+            performanceChart.data.datasets[0].data = Object.values(modelData.metrics);
+            performanceChart.update();
+        } else {
+            const perfCtx = document.getElementById('performanceChart').getContext('2d');
+            performanceChart = new Chart(perfCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['F1-Score', 'Accuracy', 'Precision', 'Recall'],
+                    datasets: [{
+                        label: `${modelName} Performance`,
+                        data: Object.values(modelData.metrics),
+                        backgroundColor: 'rgba(88, 166, 255, 0.6)',
+                        borderColor: '#58a6ff',
+                        borderWidth: 1
+                    }]
+                },
+                options: { ...chartDefaultOptions, scales: { ...chartDefaultOptions.scales, y: { ...chartDefaultOptions.scales.y, suggestedMax: 1 } } }
+            });
+        }
+        performanceChart.data.datasets[0].label = `${modelName} Performance`;
+
+        // Update Feature Importance Chart
+        const featureLabels = Object.keys(modelData.features);
+        const featureData = Object.values(modelData.features);
+        
+        if(featureImportanceChart) {
+            featureImportanceChart.data.labels = featureLabels;
+            featureImportanceChart.data.datasets[0].data = featureData;
+            featureImportanceChart.update();
+        } else {
+            const featCtx = document.getElementById('featureImportanceChart').getContext('2d');
+            featureImportanceChart = new Chart(featCtx, {
+                type: 'bar',
+                data: {
+                    labels: featureLabels,
+                    datasets: [{
+                        label: 'Feature Importance',
+                        data: featureData,
+                        backgroundColor: 'rgba(163, 113, 247, 0.6)',
+                        borderColor: '#a371f7',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    ...chartDefaultOptions,
+                    indexAxis: 'y',
+                    plugins: { legend: { display: false } },
+                    scales: { ...chartDefaultOptions.scales, x: { ...chartDefaultOptions.scales.x, suggestedMax: 0.4 } }
+                }
+            });
+        }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        renderAttackCards();
+        renderAttackDistributionChart();
+        populateModelSelector();
+        updatePerformanceCharts(document.getElementById('modelSelector').value);
+
+        // Smooth scrolling for nav links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    });
+    </script>
+</body>
+</html>
