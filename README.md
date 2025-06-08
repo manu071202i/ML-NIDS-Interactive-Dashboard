@@ -1,69 +1,88 @@
-ML-NIDS: Machine Learning-Based Network Intrusion Detection Interactive Dashboard
-📊 Project Overview
-This project delivers an interactive web dashboard showcasing a Machine Learning-based Intrusion Detection System (ML-NIDS). It provides intuitive, visual insight into the dataset, machine learning pipeline, model performance, and actionable security insights.
+# 🛡️ ML-NIDS: Machine Learning-Based Network Intrusion Detection Dashboard
 
-🎯 Goal
-To enhance the precision and reliability of intrusion detection systems, compare machine learning models and feature selection techniques, and support organizations in identifying vulnerabilities and misconfigurations within their networks.
+An interactive web-based dashboard that showcases a Machine Learning-powered Intrusion Detection System (IDS) using the UNSW-NB15 dataset. This project provides insight into the data, compares multiple ML models, visualizes key features, and highlights actionable insights into network vulnerabilities and misconfigurations.
 
-🔧 Features
-📁 Interactive Dataset Overview
-Visualizes the distribution of attack types in the UNSW-NB15 dataset.
+---
 
-🔄 ML Pipeline Visualization
-Step-by-step illustration of data processing, training, and evaluation stages.
+## 🎯 Project Goals
 
-📊 Model Performance Comparison
-Dynamically compare models (Logistic Regression, Decision Tree, Random Forest, SVM, MLPClassifier, XGBoost) using F1-Score, Accuracy, Precision, and Recall.
+- Enhance the precision and reliability of intrusion detection systems.
+- Protect networks from cyber threats by leveraging ML techniques.
+- Compare the effectiveness of multiple machine learning algorithms.
+- Visualize the impact of feature selection on model performance.
+- Provide organizations with insights into network vulnerabilities.
 
-📌 Feature Importance Visualization
-Displays influential features in network traffic for each model.
+---
 
-📈 Actionable Insights
-Connects intrusion types with common system misconfigurations and vulnerabilities.
+## 🚀 Features
 
-📱 Responsive Design
-Fully responsive layout for desktop, tablet, and mobile devices.
+- 📁 **Interactive Dataset Overview**  
+  Visualize the distribution of different attack categories from the UNSW-NB15 dataset.
 
-💻 Technologies Used
-Frontend: HTML5, CSS3 (Tailwind CSS)
+- 🔄 **ML Pipeline Visualization**  
+  Step-by-step representation of the data preprocessing and model training flow.
 
-Visualization: Vanilla JavaScript, Chart.js
+- 📊 **Model Performance Comparison**  
+  Select and compare models (Logistic Regression, Decision Tree, Random Forest, SVM, MLPClassifier, XGBoost) using metrics like F1-Score, Accuracy, Precision, and Recall.
 
-Data Source: UNSW-NB15 Dataset
+- 📌 **Feature Importance Visualization**  
+  Discover which network traffic features have the most influence on detection.
 
-🚀 How to Run This Dashboard (Web Version)
-Download the index.html file.
+- 💡 **Actionable Insights**  
+  Links intrusion types to likely misconfigurations or vulnerabilities in the system.
 
-Open it in any modern web browser (Chrome, Firefox, Edge).
+- 📱 **Responsive Design**  
+  Optimized for use on desktops, tablets, and mobile devices.
 
-(Optional) Host it via GitHub Pages for sharing:
+---
 
-bash
-Copy
-Edit
-# GitHub Pages Hosting Instructions:
-# Push to your GitHub repo, then go to Settings > Pages > Select main branch
-🔬 Conceptual Backend Setup (Python ML Pipeline)
-To build and run the Python-based ML backend:
+## 🧰 Tech Stack
 
-bash
-Copy
-Edit
+| Layer       | Technology                |
+|-------------|----------------------------|
+| Frontend    | HTML5, CSS3 (Tailwind CSS) |
+| Interactivity & Charts | Vanilla JS, Chart.js        |
+| Dataset     | UNSW-NB15 (simulated for demo) |
+
+---
+
+## 📂 How to Run (Web Version)
+
+> This is a single-page application (SPA).
+
+1. **Download** or **clone** the repository.
+2. Open `index.html` in any modern browser (Chrome, Firefox, Edge).
+3. ✅ You're done!
+
+### Optional: Host with GitHub Pages
+
+1. Push the repo to GitHub.
+2. Go to **Settings > Pages**.
+3. Choose the `main` branch as the source.
+4. Your site will be live at `https://your-username.github.io/your-repo-name/`.
+
+---
+
+## 🐍 (Optional) Python Backend Setup – Conceptual ML Pipeline
+
+If you'd like to integrate or run the full ML backend (model training, data processing):
+
+```bash
 # Clone the repo
 git clone https://github.com/your-username/ML-NIDS-Project.git
 cd ML-NIDS-Project
 
-# Set up environment
+# Create a virtual environment
 python -m venv venv
-source venv/bin/activate  # macOS/Linux
+source venv/bin/activate  # For macOS/Linux
 # OR
-.\venv\Scripts\activate    # Windows
+.\venv\Scripts\activate    # For Windows
 
 # Install dependencies
 pip install -r requirements.txt
 
 # Add the UNSW-NB15 dataset
-# Place the dataset into the `data/` directory
+# Place dataset files into the `data/` directory
 
-# Run the main ML script
+# Run the main script
 python src/main.py
